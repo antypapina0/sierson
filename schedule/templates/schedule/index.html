@@ -1,0 +1,48 @@
+{% load static %}
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="Vanilla javascript plugin for building nice responsive timetables">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Timetable.js demo</title>
+    <link rel="stylesheet" href="{% static 'css/demo.css' %}">
+    <link rel="stylesheet" href="{% static 'css/timetablejs.css' %}">
+    <link rel="stylesheet" href="{% static 'js/timetable.js' %}">
+  </head>
+  <body>
+
+    <div class="hero-unit">
+      <h1>Timetable.js demo</h1>
+      <p>Vanilla javascript plugin for building nice responsive timetables. More info on <a href="https://github.com/Grible/timetable.js" target="_blank">Github</a>.</p>
+    </div>
+
+    <div class="timetable"></div>
+
+    <script src="{% static 'js/timetable.js' %}"></script>
+
+    <script>
+      var timetable = new Timetable();
+
+      var data = '{{ jsonData|safe }}';
+      var jsonData = JSON.parse(data);
+      console.log(jsonData);
+
+      timetable.setScope(8,20)
+
+
+      timetable.addLocations(['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek']);
+
+      for (var key in jsonData) {
+        var lessonData = jsonData[key];
+        timetable.addEvent(lessonData.name, lessonData.datatime[0], new Date(0,0,0,lessonData.datatime[1],lessonData.datatime[2]), new Date(0,0,0,lessonData.datatime[3],lessonData.datatime[4]), { url: '#' });
+      }
+      
+
+      var renderer = new Timetable.Renderer(timetable);
+      renderer.draw('.timetable');
+    </script>
+
+
+</body>
+</html>

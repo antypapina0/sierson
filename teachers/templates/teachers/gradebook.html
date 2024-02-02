@@ -1,0 +1,407 @@
+{% extends "base.html" %}
+
+{% block body %}
+<style>
+  table, th, td {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+
+  th, td {
+    min-width: 100px;
+  }
+
+  .tooltip-grade {
+  position: relative;
+  display: inline-block;
+  }
+
+  .tooltip-grade .tooltiptext-grade-desc {
+    visibility: hidden;
+    min-width: 120px;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -60px;
+    background-color: black;
+    color: #fff;
+    text-align:center;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+    white-space: nowrap;
+  }
+
+  .tooltip-grade:hover .tooltiptext-grade-desc {
+    visibility: visible;
+  }
+  .grade-select {
+    max-width: 200px;
+    margin: auto;
+  }
+
+  .grade-select-modal {
+    max-width: 200px;
+  }
+
+  .grade-value-1, .grade-value-2{
+    color: green;
+  }
+  .grade-value-5, .grade-value-6{
+    color: red;
+  }
+</style>
+<!-- <h3 class="m-4">Dziennik</h3>
+  <div class="row">
+    <div class="col-12">
+      <div class="card border-primary ms-4 me-4 mb-4">
+        <div class="card-header">
+          <i class="fa-solid fa-list fa-lg"></i> {{ subject }}
+        </div>
+        <div class="card-body">
+          <p class="card-text">
+            <div class="container mt-4">
+              <div class="table-responsive">
+                  <div class="overflow-autgro">
+
+                    {% for key, value in months_values.items %}
+                    {% endfor %}
+
+                    <form method="post">
+                      {% csrf_token %}
+                      <table class="table">
+                          <thead>
+                              <tr>
+                                  <th>ID</th>
+                                  <th>Imię</th>
+                                  <th>Nazwisko</th>
+                                  {% for key, value in months_values.items %}
+                                  <th>{{ key }}</th>
+                                  {% endfor %}
+
+                                  <th>Średnia</th>
+                              </tr>
+                          </thead>
+                          
+                            
+                            {% for student in students %}
+                            <tbody>
+
+                                <tr>
+                                    <td>{{ student.id }}</td>
+                                    <td>{{ student.student.first_name }}</td>
+                                    <td>{{ student.student.last_name }}</td>
+                                    {% for key, month_number in months_values.items %}
+                                      <td>
+
+                                        {% for grade in grades %}
+                                          {% if grade.student.id == student.id and subject == grade.subject and month_number == grade.get_created_month %}
+                                            <div class="tooltip-grade grade-value-{{grade.assigment.weight}}" data-bs-toggle="modal" data-bs-target="#grade_details_{{grade.id}}">
+                                              {{ grade.display_value }}
+                                              <span class="tooltiptext-grade-desc">
+                                                {{ grade.description }}
+                                              </span>
+                                            </div>
+
+                                            <div class="modal" id="grade_details_{{grade.id}}" tabindex="-1" aria-labelledby="myModalLabel1" aria-hidden="true">
+                                              <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                  <div class="modal-header">
+                                                    <h5 class="modal-title">
+                                                      Kategoria: {{ grade.assigment.name }}<br>
+                                                      Opis: {{ grade.description }}<br>
+                                                      waga: {{ grade.assigment.weight }}<br>
+                                                      wystawiono: {{ grade.display_created_at_date }}<br>
+                            
+                                                      {% if grade.display_created_at_date != grade.display_updated_at_date %}
+                                                      zaktualizowano: {{ grade.display_updated_at_date }}
+                                                      {% endif %}
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                                      <span aria-hidden="true"></span>
+                                                    </button>
+                                                  </div>
+                                                  <div class="modal-body">
+                                                    Ocena: {{ grade.display_value }}<br>
+                                                    <form action="#" method="POST">
+                                                      {% csrf_token %}
+                                                      <div class="form-group grade-select-modal">
+                                                        <select class="form-select" id="id_change_grade_{{grade.id}}" name="change_grade_{{grade.id}}">
+                                                          <option value="0" selected disabled hidden>Zmień ocenę</option>
+                                                          <option value="1">1</option>
+                                                          <option value="1+">1+</option>
+                                                          <option value="2">2-</option>
+                                                          <option value="2">2</option>
+                                                          <option value="2+">2+</option>
+                                                          <option value="3-">3-</option>
+                                                          <option value="3">3</option>
+                                                          <option value="3+">3+</option>
+                                                          <option value="4-">4-</option>
+                                                          <option value="4">4</option>
+                                                          <option value="4+">4+</option>
+                                                          <option value="5-">5-</option>
+                                                          <option value="5">5</option>
+                                                          <option value="5+">5+</option>
+                                                          <option value="6-">6-</option>
+                                                          <option value="6">6</option>
+                                                        </select>
+                                                      </div>
+                                                      <input type="submit" class="btn btn-primary" value="Zapisz">
+                                                    </form>
+                                                  </div>
+                                                    
+                                                  <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Wróć</button>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          {% endif %}
+                                        {% endfor %}
+                                      </td>
+                                    {% endfor %}
+
+                                    <td></td>
+                                    <td>
+                                      <div class="form-group grade-select">
+                                        <select class="form-select" id="id_grade_{{student.id}}" name="grade_{{student.id}}">
+                                          <option value="0" selected disabled hidden>Ocena</option>
+                                          <option value="1">1</option>
+                                          <option value="1+">1+</option>
+                                          <option value="2">2-</option>
+                                          <option value="2">2</option>
+                                          <option value="2+">2+</option>
+                                          <option value="3-">3-</option>
+                                          <option value="3">3</option>
+                                          <option value="3+">3+</option>
+                                          <option value="4-">4-</option>
+                                          <option value="4">4</option>
+                                          <option value="4+">4+</option>
+                                          <option value="5-">5-</option>
+                                          <option value="5">5</option>
+                                          <option value="5+">5+</option>
+                                          <option value="6-">6-</option>
+                                          <option value="6">6</option>
+                                        </select>
+                                      </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                              
+                            {% endfor %}
+
+                      </table>
+                      <div class="form-group grade-description">
+                        <label class="col-form-label mt-2" for="inputDefault">Opis</label>
+                        <input type="text" class="form-control" placeholder="Opis" id="id_description" name="description">
+                      </div>
+                      <div class="form-group grade-select">
+                        <select class="form-select mt-2" id="id_assigment" name="assigment">
+                          <option value="0" selected disabled hidden>Kategoria</option>
+                          {% for assigment in assigments %}
+                            <option value="{{ assigment }}">{{ assigment }}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      <button type="submit" class="btn btn-outline-primary">Dodaj oceny</button>
+                    </form>
+                  </div>
+              </div>
+          </div>
+        
+            
+          </p>
+
+
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+  <h3 class="m-4">Dziennik</h3>
+  <div class="row">
+    <div class="col-12">
+      <div class="card border-primary ms-4 me-4 mb-4">
+        <div class="card-header">
+          <i class="fa-solid fa-list fa-lg"></i> {{ subject }}
+        </div>
+        <div class="card-body">
+          <p class="card-text">
+            <div class="container mt-4">
+              <div class="table-responsive">
+                  <div class="overflow-autgro">
+
+                    <form method="post">
+                      {% csrf_token %}
+                      <table class="table">
+                          <thead>
+                              <tr>
+                                  <th>ID</th>
+                                  <th>Imię</th>
+                                  <th>Nazwisko</th>
+                                  {% for key, value in terms.items %}
+                                    <th>{{ key }}</th>
+                                    <th>Średnia</th>
+                                  {% endfor %}
+                                  <!-- <th>Styczeń</th>
+                                  <th>Luty</th>
+                                  <th>Marzec</th>
+                                  <th>Kwiecień</th> -->
+                                  
+                              </tr>
+                          </thead>
+                          
+                            
+                            {% for student in students %}
+                            <tbody>
+                                <!-- Oceny dla każdego z uczniów -->
+                                <tr>
+                                    <td>{{ student.id }}</td>
+                                    <td>{{ student.student.first_name }}</td>
+                                    <td>{{ student.student.last_name }}</td>
+                                    {% for key, term_number in terms.items %}
+                                      <td>
+                                        <!--
+                                          Oceny dla semestru
+                                        -->
+                                        {% for grade, term in grades_with_terms.items %}
+                                          {% comment %} {% if grade.student.id == student.id and subject == grade.subject and month_number == grade.get_created_month %}
+                                            <div class="tooltip-grade grade-value-{{grade.assigment.weight}}" data-bs-toggle="modal" data-bs-target="#grade_details_{{grade.id}}">
+                                              {{ grade.display_value }}
+                                              <span class="tooltiptext-grade-desc">
+                                                {{ grade.description }}
+                                              </span>
+                                            </div> {% endcomment %}
+                                            {% if grade.student.id == student.id and subject == grade.subject and term == term_number %}
+                                              <div class="tooltip-grade grade-value-{{grade.assigment.weight}}" data-bs-toggle="modal" data-bs-target="#grade_details_{{grade.id}}">
+                                                {{ grade.display_value }}
+                                                <span class="tooltiptext-grade-desc">
+                                                  {{ grade.description }}
+                                                </span>
+                                              </div>
+                                            <!-- MODAL SZCZEGÓŁY OCENY -->
+                                            <div class="modal" id="grade_details_{{grade.id}}" tabindex="-1" aria-labelledby="myModalLabel1" aria-hidden="true">
+                                              <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                  <div class="modal-header">
+                                                    <h5 class="modal-title">
+                                                      Kategoria: {{ grade.assigment.name }}<br>
+                                                      Opis: {{ grade.description }}<br>
+                                                      waga: {{ grade.assigment.weight }}<br>
+                                                      wystawiono: {{ grade.display_created_at_date }}<br>
+                            
+                                                      {% if grade.display_created_at_date != grade.display_updated_at_date %}
+                                                      zaktualizowano: {{ grade.display_updated_at_date }}
+                                                      {% endif %}
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                                      <span aria-hidden="true"></span>
+                                                    </button>
+                                                  </div>
+                                                  <div class="modal-body">
+                                                    Ocena: {{ grade.display_value }}<br>
+                                                    <form action="#" method="POST">
+                                                      {% csrf_token %}
+                                                      <div class="form-group grade-select-modal">
+                                                        <select class="form-select" id="id_change_grade_{{grade.id}}" name="change_grade_{{grade.id}}">
+                                                          <option value="0" selected disabled hidden>Zmień ocenę</option>
+                                                          <option value="1">1</option>
+                                                          <option value="1+">1+</option>
+                                                          <option value="2">2-</option>
+                                                          <option value="2">2</option>
+                                                          <option value="2+">2+</option>
+                                                          <option value="3-">3-</option>
+                                                          <option value="3">3</option>
+                                                          <option value="3+">3+</option>
+                                                          <option value="4-">4-</option>
+                                                          <option value="4">4</option>
+                                                          <option value="4+">4+</option>
+                                                          <option value="5-">5-</option>
+                                                          <option value="5">5</option>
+                                                          <option value="5+">5+</option>
+                                                          <option value="6-">6-</option>
+                                                          <option value="6">6</option>
+                                                        </select>
+                                                      </div>
+                                                      <input type="submit" class="btn btn-primary" value="Zapisz">
+                                                    </form>
+                                                  </div>
+                                                    
+                                                  <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Wróć</button>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          {% endif %}
+                                        {% endfor %}
+                                      </td>
+                                      <td>
+                                        {% for student_avg, avarage in avarages_with_terms.items %}
+                                          {% if student_avg == student %}
+                                            {% if term_number == 1 %}
+                                              {{ avarage.0 }}
+                                            {% else %}
+                                              {{ avarage.1 }}
+                                            {% endif %}
+                                          {% endif %}
+                                        {% endfor %}
+                                      </td>
+                                    {% endfor %}
+                                    <td>
+                                      <div class="form-group grade-select">
+                                        <select class="form-select" id="id_grade_{{student.id}}" name="grade_{{student.id}}">
+                                          <option value="0" selected disabled hidden>Ocena</option>
+                                          <option value="1">1</option>
+                                          <option value="1+">1+</option>
+                                          <option value="2">2-</option>
+                                          <option value="2">2</option>
+                                          <option value="2+">2+</option>
+                                          <option value="3-">3-</option>
+                                          <option value="3">3</option>
+                                          <option value="3+">3+</option>
+                                          <option value="4-">4-</option>
+                                          <option value="4">4</option>
+                                          <option value="4+">4+</option>
+                                          <option value="5-">5-</option>
+                                          <option value="5">5</option>
+                                          <option value="5+">5+</option>
+                                          <option value="6-">6-</option>
+                                          <option value="6">6</option>
+                                        </select>
+                                      </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                              
+                            {% endfor %}
+
+                      </table>
+                      <div class="form-group grade-description">
+                        <label class="col-form-label mt-2" for="inputDefault">Opis</label>
+                        <input type="text" class="form-control" placeholder="Opis" id="id_description" name="description">
+                      </div>
+                      <div class="form-group grade-select">
+                        <select class="form-select mt-2" id="id_assigment" name="assigment">
+                          <option value="0" selected disabled hidden>Kategoria</option>
+                          {% for assigment in assigments %}
+                            <option value="{{ assigment }}">{{ assigment }}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      <button type="submit" class="btn btn-outline-primary">Dodaj oceny</button>
+                    </form>
+                  </div>
+              </div>
+          </div>
+        
+            
+          </p>
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

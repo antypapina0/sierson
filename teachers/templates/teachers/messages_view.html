@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block body %}
+<h3 class="text-center m-4">Komunikator</h3>
+<div class="row justify-content-center">
+    <div class="container">
+        <div class="row">
+          <div class="col-sm">
+            <div class="card border-primary mb-3" style="max-width: 100%; margin:auto;">
+                <div class="card-header">
+                    <h3>Opiekunowie</h3>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        
+                        <table class="table table-hover">
+                            <thead>
+                              <tr>
+                                <th scope="col">ID studenta</th>
+                                <th scope="col">Nazwisko i imię studenta</th>
+                                <th scope="col">Klasa</th>
+                                <th scope="col">Nazwisko i imię rodzica</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                            {% for student in students %}
+                                <tr class="table-primary">
+                                    <td>{{ student.id }}</td>
+                                    <td>{{student}}</td>
+                                    <td>{{student.class_id.class_name}} {{student.class_id.class_letter}}</td>
+                                    <td>
+                                        <a href="{% url 'room' username=student.parent_id.parent.username %}">{{student.parent_id}}</a>
+                                    </td>
+                                </tr>
+                              {% endfor %}
+                          </table>
+                    </p>
+                </div>
+            </div>
+          </div>
+          <div class="col-sm">
+            <div class="card border-primary mb-3" style="max-width: 100%; margin:auto;">
+                <div class="card-header">
+                    <h3>Nauczyciele</h3>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        
+                        <table class="table table-hover" style="min-height:200px;">
+                            <thead>
+                              <tr>
+                                <th scope="col">ID Nauczyciela</th>
+                                <th scope="col">Imie i nazwisko Nauczyciela</th>
+                                <th scope="col">Wychowawca klasy</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                            {% for teacher in teachers %}
+                                <tr class="table-primary">
+                                    <td>{{ teacher.id }}</td>
+                                    <td>
+                                        <a href="{% url 'room' username=teacher.teacher.username %}">{{teacher}}</a>
+                                    </td>
+                                </tr>
+                              {% endfor %}
+                          </table>
+                    </p>
+                </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block body %}
+  <h3 class="text-center m-4">Dodaj użytkownika</h3>
+  {% if success %}
+    <div class="aler alert-success" role="alert">Pomyślnie dodano użytkowanika</div>
+  {% else %}
+    <div class="row justify-content-center">
+        <div class="col-6">
+            <div class="card bg-secondary mb-3">
+                <div class="card-header">
+                    <i class="fa-solid fa-address-card"></i>Stwórz nowego użytkownika
+                </div>
+                <div class="card-body">
+                  <form action="{% url 'create' %}" method="POST">
+                    {% csrf_token %}
+                    {% for field in user_form %}
+                        <div class="form-group" id="div_{{ field.id_for_label }}">
+                            <label for="{{ field.id_for_label }}"{% if field.name == 'user_type' %} class="user-type-label"{% endif %}>{{ field.label }}</label>
+                            {{ field }}
+                            <div style="color:red;">{{ field.errors }}</div>
+                        </div>
+                    {% endfor %}
+                    <div id="student_form">
+                      {% for field in student_form %}
+                          <div class="form-group" id="div_{{ field.id_for_label }}">
+                              <label for="{{ field.id_for_label }}"{% if field.name == 'user_type' %} class="user-type-label"{% endif %}>{{ field.label }}</label>
+                              {{ field }}
+                              <div style="color:red;">{{ field.errors }}</div>
+                          </div>
+                      {% endfor %}
+                    </div>
+                    <div id="teacher_form">
+                      {% for field in teacher_form %}
+                          <div class="form-group" id="div_{{ field.id_for_label }}">
+                              <label for="{{ field.id_for_label }}"{% if field.name == 'user_type' %} class="user-type-label"{% endif %}>{{ field.label }}</label>
+                              {{ field }}
+                              <div style="color:red;">{{ field.errors }}</div>
+                          </div>
+                      {% endfor %}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Dodaj</button>
+                    <a href="{% url 'home' %}" class="btn btn-secondary">Wyjdź</a>
+                  </form>
+                </div>
+              </div>
+        </div>
+    </div>
+  {% endif %}
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    // ukryj dodatkowe pola dla różnych typów użytkowników
+    $('#div_id_teacher_subject').hide();
+    $('#student_form').hide();
+    $('#teacher_form').hide();
+    $(document).ready(function() {
+      $('#id_user_type').change(function() {
+        var selectedOption = $(this).val();
+
+        // pokaż odpowiednie pola dla różnych typów użytkowników
+        // oraz ukryj reszte pól
+
+
+        if (selectedOption === 'Student') {
+          $('#student_form').show();
+        } else {
+          $('#student_form').hide();
+        }
+
+        if (selectedOption === 'Teacher') {
+          $('#teacher_form').show();
+        } else {
+          $('#teacher_form').hide();
+        }
+
+      });
+    });
+  </script>
+{% endblock %}

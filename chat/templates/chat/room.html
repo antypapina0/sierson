@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<style>
+    .receiver-message
+    {
+        text-align: left;
+    }
+
+    .sender-message
+    {
+        text-align: right;
+    }
+
+    .mess-cloud{
+        max-width: 75%;
+        display: inline-block;
+        overflow: hidden;
+        white-space: pre-wrap;
+        text-overflow: ellipsis;
+        word-wrap: break-word;
+        padding:10px;
+        border-radius: 5px;
+        color:white;
+        font-size:20px;
+        transition: max-height 0.3s ease-in-out; 
+    }
+
+    .message-scrool {
+        overflow-y: scroll;
+        height:550px;
+    }
+
+    .send-button {
+        text-align: center;
+    }
+
+</style>
+
+<h3 class="text-center m-4">CZAT</h3>
+<div class="row justify-content-center">
+    <!-- <textarea id="chat-log" cols="100" rows="20">
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    </textarea><br> -->
+    <div class="card border-primary mb-3" style="max-width: 75%;">
+        <div class="card-header">Wiadomości</div>
+        <div class="card-body message-scrool" id="msg-scroll">
+          <!-- <h4 class="card-title">Primary card title</h4> -->
+          <div class="card-text" id="message-container">
+            {% for message in messages %}
+                {% if message.sender == request.user.username %}
+                    <p class="sender-message">
+                        {{message.sender}}: <br>
+                        <span class="mess-cloud bg-success">{{ message }}</span>
+                    </p>
+                {% else %}
+                    <p class="receiver-message">
+                        {{message.sender}}: <br>
+                        <span class="mess-cloud bg-primary">{{ message }}</span>
+                    </p>
+                {% endif %}
+            {% endfor %}
+                </div>
+          <div class="container">
+            <div class="row">
+                <div class="col-lg-10">
+                    <input id="chat-message-input" class="form-control" type="Wiadomość">
+                </div>
+
+                <div class="col-lg-2 send-button">
+                    <input id="chat-message-submit" type="button" class="btn btn-outline-success" value="Wyślij">
+                </div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    <br>
+    
+    
+    {{ user.id|json_script:"username" }}
+    {{ user.username|json_script:"username-receiver" }}
+    {{ request.user.username|json_script:"message-username"}}
+
+</div>
+
+<script>
+    const roomName = JSON.parse(document.getElementById('username').textContent);
+    const message_username = JSON.parse(document.getElementById('message-username').textContent);
+    const receiver = JSON.parse(document.getElementById('username-receiver').textContent);
+
+    const chatSocket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/chat/'
+        + roomName
+        + '/'
+    );
+
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+
+
+        if (data.username == message_username) {
+            document.querySelector('#message-container').innerHTML += `
+                                                                    <p class="sender-message">
+                                                                        ${message_username}: <br>
+                                                                        <span class="mess-cloud bg-success">${data.message}</span>
+                                                                    </p>
+            `
+        } else {
+            document.querySelector('#message-container').innerHTML += `
+                                                                    <p class="receiver-message">
+                                                                        ${receiver}: <br>
+                                                                        <span class="mess-cloud bg-primary">${data.message}</span>
+                                                                    </p>
+            `
+        }
+
+        const messageContainer = document.getElementById('msg-scroll')
+
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+        
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    document.querySelector('#chat-message-input').focus();
+    document.querySelector('#chat-message-input').onkeyup = function(e) {
+        if (e.keyCode === 13) {  // enter, return
+            document.querySelector('#chat-message-submit').click();
+        }
+    };
+
+    document.querySelector('#chat-message-submit').onclick = function(e) {
+        const messageInputDom = document.querySelector('#chat-message-input');
+        const message = messageInputDom.value;
+        chatSocket.send(JSON.stringify({
+            'message': message,
+            'username': message_username,
+            'receiver': receiver
+        }));
+        messageInputDom.value = '';
+    };
+
+</script>
+
+{% endblock %}

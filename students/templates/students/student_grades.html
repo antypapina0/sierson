@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block body %}
+<style>
+  table, th, td {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+
+  th, td {
+    min-width: 100px;
+  }
+
+  .tooltip-grade {
+  position: relative;
+  display: inline-block;
+  }
+
+  .tooltip-grade .tooltiptext-grade-desc {
+    visibility: hidden;
+    min-width: 120px;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -60px;
+    background-color: black;
+    color: #fff;
+    text-align:center;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+    white-space: nowrap;
+  }
+
+  .tooltip-grade:hover .tooltiptext-grade-desc {
+    visibility: visible;
+  }
+  .grade-select {
+    max-width: 200px;
+    margin: auto;
+  }
+
+  .grade-select-modal {
+    max-width: 200px;
+  }
+
+  .grade-value-1, .grade-value-2{
+    color: green;
+  }
+  .grade-value-5, .grade-value-6{
+    color: red;
+  }
+</style>
+  <h3 class="m-4">Moje oceny</h3>
+  <div class="row">
+    <div class="col-12">
+      <div class="card border-primary ms-4 me-4 mb-4">
+        <div class="card-header">
+          <i class="fa-solid fa-list fa-lg"></i> Wszystkie oceny
+        </div>
+        <div class="card-body">
+          <p class="card-text">
+            <div class="container mt-4">
+              <div class="table-responsive">
+                  <div class="overflow-autgro">
+                      <table class="table">
+                          <thead>
+                              <tr>
+                                  <th>Przedmiot</th>
+                                  <th>Oceny</th>                                 
+                              </tr>
+                          </thead>
+
+                          <tbody>
+                            {% for subject, grades in student_grades.items %}
+                            <tr>
+                                <td>
+                                  {{subject}}
+                                </td>
+                                <td>
+                                  {% for grade in grades %}
+                                    {{ grade }}
+                                  {% endfor %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                          </tbody>
+                            
+                          
+                      </table>
+                      
+                  </div>
+              </div>
+          </div>
+        
+            
+          </p>
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

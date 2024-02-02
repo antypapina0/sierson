@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block body %}
+<h3 class="text-center m-4">Dodaj użytkownika</h3>
+<div class="row justify-content-center">
+    What chat room would you like to enter?<br>
+<input id="username-input" type="text" size="100"><br>
+<input id="username-submit" type="button" value="Enter">
+
+</div>
+
+
+<script>
+    document.querySelector('#username-input').focus();
+    document.querySelector('#username-input').onkeyup = function(e) {
+        if (e.keyCode === 13) {  // enter, return
+            document.querySelector('#username-submit').click();
+        }
+    };
+
+    document.querySelector('#username-submit').onclick = function(e) {
+        var roomName = document.querySelector('#username-input').value;
+        window.location.pathname = '/chat/' + roomName + '/';
+    };
+</script>
+
+{% endblock %}
