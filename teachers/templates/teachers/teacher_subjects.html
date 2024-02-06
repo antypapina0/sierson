@@ -22,6 +22,9 @@
                     <button type="button" class="btn btn-outline-success btn-sm" onclick="window.location.href='{% url 'gradebook' classroom=lesson.class_id__class_name letter=lesson.class_id__class_letter subject_name=lesson.subject_id__subject_name %}'">
                       otwórz dziennik
                     </button>
+                    <button type="button" class="btn btn-outline-success btn-sm" onclick="window.location.href='{% url 'lessons_view' classroom=lesson.class_id__class_name letter=lesson.class_id__class_letter subject_name=lesson.subject_id__subject_name %}'">
+                      Pokaż zajęcia
+                    </button>
                     <button type="button" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#student_chart_{{lesson.class_id}}_{{lesson.class_id__class_letter}}_{{lesson.subject_id__id}}">
                       Wykres
                     </button>

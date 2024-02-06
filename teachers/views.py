@@ -7,9 +7,9 @@ from django.core.mail import send_mail
 from django.core.mail import EmailMessage
 
 
-from schedule.models import Lesson
+from schedule.models import Lesson, LessonInstance
 from school.models import Class, Term
-from students.models import Student
+from students.models import Student, StudentAttendance
 from grades.models import Assigment, Grade
 from subjects.models import Subject
 from parents.models import Parent
@@ -140,7 +140,6 @@ def gradebook_view(request, classroom, letter, subject_name):
     for student in students:
         avarage = Grade.get_avarage_grade(student, subject, term)
         avarages_with_terms[student] = avarage
-    print(avarages_with_terms)
 
     context = {
             'students': students,
@@ -245,6 +244,153 @@ def contact_parent_view(request, student):
 @login_required
 def create_assigment(request):
     pass
+
+def lessons_view(request, classroom, letter, subject_name):
+
+    classroom_id = Class.objects.get(class_name=classroom, class_letter=letter)
+
+    subject = Subject.objects.get(subject_name = subject_name)
+
+    actual_lesson = Lesson.objects.filter(class_id = classroom_id, subject_id=subject)
+
+    lessons = LessonInstance.objects.filter(lesson__in=actual_lesson.all())
+    
+    context = {
+        'lessons': lessons
+    }
+
+    return render(request, 'teachers/lessons_view.html', context=context)
+
+@login_required
+def check_attendance_view(request, id):
+
+    actual_lesson_instance = LessonInstance.objects.get(id=id)
+
+    related_lesson = actual_lesson_instance.lesson
+
+    students = Student.objects.filter(class_id=related_lesson.class_id)
+
+    students_atts = StudentAttendance.objects.filter(lesson=actual_lesson_instance)
+    print(students_atts)
+
+    context = {
+        'lesson': actual_lesson_instance,
+        'students_atts': students_atts,
+        'students': students
+    }
+
+    cleaned_attendances = {}
+    for student in students:
+        attendance_key = 'attendance_' + str(student.id)
+        if attendance_key in request.POST:
+            attendance_value = request.POST[attendance_key]
+            cleaned_attendances[student.id] = attendance_value
+
+            if attendance_value == "OB":
+                student_attendance = StudentAttendance.objects.filter(
+                    student=student,
+                    lesson=actual_lesson_instance
+                ).update(
+                    is_present = True,
+                    is_absen = False,
+                    is_late = False
+                )
+            elif attendance_value == "NB":
+                student_attendance = StudentAttendance.objects.filter(
+                    student=student,
+                    lesson=actual_lesson_instance
+                ).update(
+                    is_present = False,
+                    is_absen = True,
+                    is_late = False
+                )
+            elif attendance_value == "SP":
+                student_attendance = StudentAttendance.objects.filter(
+                    student=student,
+                    lesson=actual_lesson_instance
+                ).update(
+                    is_present = False,
+                    is_absen = False,
+                    is_late = True
+                )
+
+    print(cleaned_attendances)
+
+    return render(request, 'teachers/check_attendance_view.html', context=context)
+
+@login_required
+def start_lesson(request, id):
+    actual_lesson_instance = LessonInstance.objects.get(id=id)
+
+    related_lesson = actual_lesson_instance.lesson
+
+    students = Student.objects.filter(class_id=related_lesson.class_id)
+
+    # for redirect
+    subject_name = related_lesson.subject_id.subject_name
+    class_name = related_lesson.class_id.class_name
+    class_letter = related_lesson.class_id.class_letter
+    
+    if actual_lesson_instance.is_started == False:
+        # Only one of Lesson instance can be started at once
+        lessons_instances = LessonInstance.objects.filter(lesson=related_lesson)
+        for lesson_instance in lessons_instances:
+            if lesson_instance.is_started:
+                return redirect(reverse('lessons_view', args=(class_name, class_letter, subject_name)))
+
+        actual_lesson_instance.is_started = True
+        actual_lesson_instance.save()
+
+        for student in students:
+            if not StudentAttendance.objects.filter(student=student, lesson=actual_lesson_instance).exists():
+                StudentAttendance.objects.create(student=student, lesson=actual_lesson_instance)
+
+    # For undo start purpose
+    elif actual_lesson_instance.is_started == True:
+
+        actual_lesson_instance.is_started = False
+        actual_lesson_instance.save()
+
+        for student in students:
+            if StudentAttendance.objects.filter(student=student, lesson=actual_lesson_instance).exists():
+                StudentAttendance.objects.filter(student=student, lesson=actual_lesson_instance).delete()
+
+
+    return redirect(reverse('lessons_view', args=(class_name, class_letter, subject_name)))
+
+@login_required
+def end_lesson(request, id):
+    actual_lesson_instance = LessonInstance.objects.get(id=id)
+
+    related_lesson = actual_lesson_instance.lesson
+
+    students = Student.objects.filter(class_id=related_lesson.class_id)
+
+    # for redirect
+    subject_name = related_lesson.subject_id.subject_name
+    class_name = related_lesson.class_id.class_name
+    class_letter = related_lesson.class_id.class_letter
+
+    actual_lesson_instance.is_started = False
+    actual_lesson_instance.is_finished = True
+    actual_lesson_instance.save()
+
+    return redirect(reverse('lessons_view', args=(class_name, class_letter, subject_name)))
+
+@login_required
+def my_class_view(request):
+    
+    actual_teacher = request.user.teacher
+    teacher_class = Class.objects.get(counselor=actual_teacher)
+
+    students = Student.objects.filter(class_id=teacher_class)
+    
+    context = {
+        'class': teacher_class,
+        'students': students,
+    }
+
+    return render(request, 'teachers/my_class_view.html', context=context)
 
 @login_required
 def messages_view(request):

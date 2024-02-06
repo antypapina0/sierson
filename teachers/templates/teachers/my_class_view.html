@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<h3 class="m-4">Dziennik</h3>
+<div class="row">
+<div class="col-12">
+    <div class="card border-primary ms-4 me-4 mb-4">
+        <div class="card-header">
+            <i class="fa-solid fa-list fa-lg"></i> {{ class.class_name }} {{ class.class_letter }}
+        </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-sm">
+              <div class="card border-primary mb-3" style="max-width: 100%; margin:auto;">
+                  <div class="card-header">
+                      <h3>Ostatnie uwagi</h3>
+                  </div>
+                  <div class="card-body">
+                      <p class="card-text">
+                          
+                          <table class="table table-hover" style="min-height:200px;">
+                              <thead>
+                                <tr>
+                                  <th scope="col">ID studenta</th>
+                                  <th scope="col">Nazwisko i imię ucznia</th>
+                                  <th scope="col">Treść uwagi</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+
+                              </tbody>
+                            </table>
+                      </p>
+                  </div>
+              </div>
+            </div>
+            <div class="col-sm">
+              <div class="card border-primary mb-3" style="max-width: 100%; margin:auto;">
+                  <div class="card-header">
+                      <h3>Ostatnie nieobecności</h3>
+                  </div>
+                  <div class="card-body">
+                      <p class="card-text">
+                          
+                          <table class="table table-hover" style="min-height:200px;">
+                              <thead>
+                                <tr>
+                                  <th scope="col">ID Nauczyciela</th>
+                                  <th scope="col">Nazwisko i imię Ucznia</th>
+                                  <th scope="col">ilość nieobecności z ostatnich 7 dni</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+
+
+                              </tbody>
+                          </table>
+                      </p>
+                  </div>
+              </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm">
+                <p class="card-text">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                            <th scope="col">ID studenta</th>
+                            <th scope="col">Nazwisko i imię studenta</th>
+                            <th scope="col">Klasa</th>
+                            <th scope="col">Akcje</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for student in students %}
+                            <tr class="table-primary">
+                                <td>{{student.id}}</td>
+                                <td>{{student}}</td>
+                                <td>{{student.class_id.class_name}} {{student.class_id.class_letter}}</td>
+                                <td>
+                                    <a href="{% url 'student_grades' id=student.id %}"><i class="fa-solid fa-book"></i></a> 
+                                    <a href="{% url 'student_attendance' id=student.id %}"><i class="fa-solid fa-clipboard-list"></i></a> 
+                                    <i class="fa-solid fa-message"></i> 
+                                    <i class="fa-solid fa-file-invoice"></i> 
+                                    <i class="fa-solid fa-chart-line"></i>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </p>
+            <div>
+        </div>
+</div>
+</div>
+
+{% endblock %}

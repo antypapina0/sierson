@@ -44,7 +44,7 @@
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="{% url 'teacher_subjects' %}">
+                  <a class="nav-link" href="{% url 'my_class_view' %}">
                     <i class="fa-solid fa-plus fa-lg"></i> Moja klasa
                   </a>
                 </li>
@@ -77,7 +77,7 @@
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="{% url 'student_grades' %}">
+                  <a class="nav-link" href="{% url 'student_grades' id=request.user.student.id %}">
                     <i class="fa-solid fa-plus fa-lg"></i> Moje oceny
                   </a>
                 </li>

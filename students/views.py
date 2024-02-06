@@ -3,14 +3,15 @@ from django.urls import reverse
 from django.shortcuts import render, redirect
 
 from grades.models import Grade
-from .models import Student
+from .models import Student, StudentAttendance
 from schedule.models import Lesson
 from subjects.models import Subject
 
-def student_grades_view(request):
+def student_grades_view(request, id):
 
-    grades = Grade.objects.filter(student=request.user.student)
-    student = Student.objects.get(id=request.user.student.id)
+    student = Student.objects.get(id=id)
+    grades = Grade.objects.filter(student=student)
+    
     lessons = Lesson.objects.filter(class_id = student.class_id)
     dist_lessons = Lesson.objects.filter(class_id = student.class_id).values(
         'class_id',
@@ -28,7 +29,28 @@ def student_grades_view(request):
         student_grades[subject.subject_name] = Grade.get_all_student_subject_grades(student, subject)
 
     context = {
-        'student_grades': student_grades
+        'student_grades': student_grades,
+        'student': student
         }
 
     return render(request, 'students/student_grades.html', context=context)
+
+def student_attendance_view(request, id):
+
+    student = Student.objects.get(id=id)
+
+    studdent_attendances = StudentAttendance(student=student)
+
+    
+
+    present_quan = 0
+    absent_quan = 0
+    late_quan = 0
+
+    context = {
+        'studdent_attendances': studdent_attendances,
+        'student': student
+    }
+
+    return render(request, 'students/student_attendance.html', context=context)
+

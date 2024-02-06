@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<h3 class="m-4">Dziennik</h3>
+<div class="row">
+    <div class="col-12">
+        <div class="card border-primary ms-4 me-4 mb-4">
+            <div class="card-header">
+                <i class="fa-solid fa-list fa-lg"></i> {{lesson}}
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm">
+                        <p class="card-text">
+                            <form method="POST">
+                                <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                            <th scope="col">ID studenta</th>
+                                            <th scope="col">Imię</th>
+                                            <th scope="col">Nazwisko</th>
+                                            <th scope="col">Obecność</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            
+                                            {% csrf_token %}
+                                            {% for student in students_atts %}
+                                                <tr class="table-primary">
+                                                    <td>{{student.student.id}}</td>
+                                                    <td>{{student.student.student.first_name}}</td>
+                                                    <td>{{student.student.student.last_name}}</td>
+                                                    <td>
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="radio" name="attendance_{{student.id}}" id="inlineRadio1_{{student.id}}" value="OB" 
+                                                            {% if student.is_present %}checked{% endif %}
+                                                            >
+                                                            <label class="form-check-label" for="inlineRadio1_{{student.id}}">OB</label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="radio" name="attendance_{{student.id}}" id="inlineRadio2_{{student.id}}" value="NB"
+                                                            {% if student.is_absen %}checked{% endif %}
+                                                            >
+                                                            <label class="form-check-label" for="inlineRadio2_{{student.id}}">NB</label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="radio" name="attendance_{{student.id}}" id="inlineRadio3_{{student.id}}" value="SP"
+                                                            {% if student.is_late %}checked{% endif %}
+                                                            >
+                                                            <label class="form-check-label" for="inlineRadio3_{{student.id}}">SP</label>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                </table>
+                                <button type="submit" class="btn btn-outline-success">Dodaj obecności</button>
+                            </form>
+                        </p>
+                    <div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

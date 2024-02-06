@@ -36,9 +36,6 @@ class School(models.Model):
 #         return f"{self.term} {self.subject}"
     
 class Term(models.Model):
-    term_year_start = models.IntegerField()
-    term_year_end = models.IntegerField()
-
     term_start_sem_1 = models.DateField()
     term_end_sem_1 = models.DateField()
 
@@ -46,7 +43,7 @@ class Term(models.Model):
     term_end_sem_2 = models.DateField()
     
     def __str__(self):
-        return f"{self.term_year_start}/{self.term_year_end} | semestr 1: {self.term_start_sem_1} - {self.term_end_sem_1} | semestr 2: {self.term_start_sem_2} - {self.term_end_sem_2}"
+        return f"semestr 1: {self.term_start_sem_1} - {self.term_end_sem_1} | semestr 2: {self.term_start_sem_2} - {self.term_end_sem_2}"
 
 class Class(models.Model):
     CLASS_CHOICES = [
@@ -67,7 +64,7 @@ class Class(models.Model):
     class_name = models.CharField(max_length=10, choices=CLASS_CHOICES)
     class_letter = models.CharField(max_length=1, choices=CLASS_LETTER_CHOICES)
     school = models.ForeignKey(School, on_delete=models.CASCADE)
-    # counselor = models.ForeignKey(Teacher, on_delete=models.PROTECT)
+    counselor = models.ForeignKey(Teacher, on_delete=models.PROTECT)
 
     def __str__(self):
         return f"{self.class_name} {self.class_letter} - {self.school}"
